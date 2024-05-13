@@ -17,6 +17,7 @@ param branch string = 'main'
 param path string = ''
 
 @description('The secret identifier of the GitHub personal access token')
+@secure()
 param secretIdentifier string = ''
 
 @secure()

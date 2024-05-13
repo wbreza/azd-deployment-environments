@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./devcenter.schema.json
 
-orgName: contoso
+orgName: azd
 environmentTypes:
   - name: Dev
     tags:
@@ -17,6 +17,11 @@ catalogs:
     branch: main
     path: /Environment-Definitions/ARMTemplates
     secretIdentifier: ""
+  - name: wbreza
+    repo: https://github.com/wbreza/azd-devcenter-catalog.git
+    branch: main
+    path: /EnvironmentDefinitions
+    secretIdentifier: "https://kv-o2pst6gaydv5o.vault.azure.net/secrets/dc-azd-o2pst6gaydv5o-pat-token"
 projects:
   - name: Project-1
     members: []

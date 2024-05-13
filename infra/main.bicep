@@ -28,12 +28,14 @@ param resourceGroupName string = ''
 @description('Id of the user or app to assign application roles')
 param principalId string
 
+param tags object = {}
+
 var abbrs = loadJsonContent('./abbreviations.json')
 
 // tags that should be applied to all resources.
-var tags = {
+var resourceTags = union(tags, {
   'azd-env-name': environmentName
-}
+})
 
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 
@@ -41,7 +43,7 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
   location: location
-  tags: tags
+  tags: resourceTags
 }
 
 var devCenterConfig = loadYamlContent('./devcenter.yaml')
@@ -51,7 +53,7 @@ module devcenter 'core/devcenter/devcenter.bicep' = {
   params: {
     name: !empty(devCenterName) ? devCenterName : 'dc-${devCenterConfig.orgName}-${resourceToken}'
     location: location
-    tags: tags
+    tags: resourceTags
     config: devCenterConfig
     catalogToken: catalogToken
     keyVaultName: !empty(catalogToken) ? keyVault.outputs.name : ''
@@ -66,7 +68,7 @@ module keyVault './core/security/keyvault.bicep' = if (!empty(catalogToken)) {
   params: {
     name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
     location: location
-    tags: tags
+    tags: resourceTags
     principalId: principalId
     permissions: {
       secrets: [
@@ -85,7 +87,7 @@ module logging './core/monitor/loganalytics.bicep' = {
   params: {
     name: !empty(logWorkspaceName) ? logWorkspaceName : 'law-${resourceToken}'
     location: location
-    tags: tags
+    tags: resourceTags
   }
 }
 
